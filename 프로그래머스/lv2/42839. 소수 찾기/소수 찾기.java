@@ -1,38 +1,53 @@
 import java.util.*;
 class Solution {
-    HashSet<Integer> hs = new HashSet<>();
+    static ArrayList<Integer> arr;
+    static boolean[] check;
 
     public int solution(String numbers) {
-        rec("", numbers);
+        int answer = 0;
+        arr = new ArrayList<>();
+        check = new boolean[numbers.length()];
 
-        int cnt = 0;
-        Iterator<Integer> ite = hs.iterator();
-        while (ite.hasNext()) {
-            int number = ite.next();
-            if(primeNumber(number)) {
-                cnt++;
+        // 가능한 모든 숫자 조합을 생성합니다.
+        for (int i = 1; i <= numbers.length(); i++) {
+            dfs(numbers, "", i);
+        }
+
+        // 생성된 숫자 조합 중 소수를 찾습니다.
+        for (int num : arr) {
+            if (isPrime(num)) {
+                answer++;
             }
         }
-        return cnt;
+
+        return answer;
     }
 
-    public void rec (String temp, String n) {
-        if(!temp.equals("")) {
-            hs.add(Integer.parseInt(temp));
-        }
-
-        for (int i = 0; i < n.length(); i++) {
-            rec(temp + n.charAt(i), n.substring(0, i) + n.substring(i + 1));
-        }
-    }
-    static boolean primeNumber(int n) {
-        if(n == 0 || n == 1) return false;
-        for (int i = 2; i < n; i++) {
-            if(n % i == 0) {
-                return false;
+    private void dfs(String numbers, String temp, int n) {
+        if (temp.length() == n) {
+            int num = Integer.parseInt(temp);
+            if (!arr.contains(num)) {
+                arr.add(num);
             }
+        }
+        for (int i = 0; i < numbers.length(); i++) {
+            if (!check[i]) {
+                check[i] = true;
+                temp += numbers.charAt(i);
+                dfs(numbers, temp, n);
+                check[i] = false;
+                temp = temp.substring(0, temp.length() - 1);
+            }
+        }
+    }
+
+    private boolean isPrime(int n) {
+        if (n < 2) return false;
+
+        for (int i = 2; i * i <= n; i++) {
+            if (n % i == 0) return false;
         }
         return true;
     }
-
 }
+
