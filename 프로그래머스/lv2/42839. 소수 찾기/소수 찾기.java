@@ -24,6 +24,12 @@ class Solution {
     }
 
     private void dfs(String numbers, String temp, int n) {
+        
+         if (temp.length() > n) {
+            return;
+        }
+
+        
         if (temp.length() == n) {
             int num = Integer.parseInt(temp);
             if (!arr.contains(num)) {
