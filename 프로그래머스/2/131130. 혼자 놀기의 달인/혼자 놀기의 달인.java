@@ -5,18 +5,21 @@ class Solution {
 
     public static int solution(int[] cards) {
         int answer = 1;
-        int len = cards.length;
-        visit = new boolean[len+1];
+        int len = cards.length; // 카드 배열의 길이
+
+        visit = new boolean[len + 1];
         List<Integer> list = new ArrayList<>();
-        for(int i=0;i<len;i++) {
-            if(!visit[i+1]) {
+
+
+        for (int i = 0; i < len; i++) {
+            if (!visit[i + 1]) {
                 depth = 1;
                 visit[i+1] = true;
                 open(cards[i], cards);
                 list.add(depth);
             }
         }
-        if(list.size()<2) {
+        if (list.size() < 2) {
             return 0;
         }
         Collections.sort(list, Collections.reverseOrder());
@@ -25,10 +28,10 @@ class Solution {
     }
 
     private static void open(int x, int[] cards) {
-        if(!visit[x]) {
+        if (!visit[x]) {
             visit[x] = true;
             depth += 1;
-            open(cards[x-1], cards);
+            open(cards[x - 1], cards);
         }
     }
 }
