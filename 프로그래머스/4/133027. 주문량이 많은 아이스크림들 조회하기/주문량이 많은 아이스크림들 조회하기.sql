@@ -1,11 +1,9 @@
-select flavor 
-from
-    (select * from july
-    union all
-    select * from first_half
-    ) a
-
-
-group by flavor
-order by sum(total_order) desc
-limit 3;
+SELECT flavor
+FROM (
+    SELECT FLAVOR, TOTAL_ORDER FROM FIRST_HALF
+    UNION ALL
+    SELECT FLAVOR, TOTAL_ORDER FROM JULY
+) AS combined_orders
+GROUP BY flavor
+ORDER BY SUM(TOTAL_ORDER) DESC
+LIMIT 3;
