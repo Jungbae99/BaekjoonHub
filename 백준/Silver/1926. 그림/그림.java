@@ -1,8 +1,9 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
-
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.StringTokenizer;
 
 
 public class Main {
@@ -18,16 +19,17 @@ public class Main {
     }
 
     public static void main(String[] args) throws IOException {
+
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
+
         int n = Integer.parseInt(st.nextToken());
         int m = Integer.parseInt(st.nextToken());
-        int[] dx = new int[]{1, 0, -1, 0};
-        int[] dy = new int[]{0, -1, 0, 1};
+        int arr[][] = new int[n][m];
+        boolean visited[][] = new boolean[n][m];
 
-
-        int[][] arr = new int[n][m];
-        boolean[][] visited = new boolean[n][m];
+        int[] dx = {-1, 0, 1, 0};
+        int[] dy = {0, 1, 0, -1};
         Queue<Node> queue = new LinkedList<>();
 
         for (int i = 0; i < n; i++) {
@@ -36,35 +38,33 @@ public class Main {
                 arr[i][j] = Integer.parseInt(st.nextToken());
             }
         }
-
         int count = 0;
         int area = 0;
         int max = 0;
-
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
+
                 if (arr[i][j] == 0 || visited[i][j]) {
                     continue;
                 }
                 count++;
-                queue.add(new Node(i, j));
                 area = 0;
+                queue.add(new Node(i, j));
                 visited[i][j] = true;
 
                 while (!queue.isEmpty()) {
-                    Node node = queue.poll();
                     area++;
-
+                    Node node = queue.poll();
                     for (int k = 0; k < 4; k++) {
-                        int nowX = node.x + dx[k];
-                        int nowY = node.y + dy[k];
-
-                        if (nowX < 0 || nowX >= n || nowY < 0 || nowY >= m) {
+                        int newX = dx[k] + node.x;
+                        int newY = dy[k] + node.y;
+                        if (newX < 0 || newX >= n || newY < 0 || newY >= m) {
                             continue;
                         }
-                        if (arr[nowX][nowY] == 1 && !visited[nowX][nowY]) {
-                            queue.add(new Node(nowX, nowY));
-                            visited[nowX][nowY] = true;
+
+                        if (arr[newX][newY] == 1 && !visited[newX][newY]) {
+                            queue.add(new Node(newX, newY));
+                            visited[newX][newY] = true;
                         }
                     }
                 }
@@ -73,7 +73,6 @@ public class Main {
                 }
             }
         }
-
         System.out.println(count);
         System.out.println(max);
     }
