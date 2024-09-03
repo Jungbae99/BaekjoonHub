@@ -1,36 +1,32 @@
 import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.PriorityQueue;
 
 class Solution {
-    boolean[] visited;
-    ArrayList<String> allRoute; 
-    
+        static Map<String, PriorityQueue<String>> map;
+    static LinkedList<String> linkedList;
+
     public String[] solution(String[][] tickets) {
-        String[] answer = {};
-        int cnt = 0;
-        visited = new boolean[tickets.length];
-        allRoute = new ArrayList<>();
-        
-        dfs("ICN", "ICN", tickets, cnt);
-        
-        Collections.sort(allRoute);
-        answer = allRoute.get(0).split(" ");
-        
-        return answer;
+        map = new HashMap<>();
+                linkedList = new LinkedList<>();
+
+        for (String[] ticket : tickets) {
+            map.computeIfAbsent(ticket[0], k -> new PriorityQueue<>()).add(ticket[1]);
+        }
+
+        dfs("ICN");
+
+        return linkedList.toArray(new String[0]);
     }
-    
-    public void dfs(String start, String route, String[][] tickets, int cnt){
-        if(cnt == tickets.length){
-            allRoute.add(route);
-            return;
-        }
-        
-        for(int i=0; i<tickets.length; i++){
-            if(start.equals(tickets[i][0]) && !visited[i]){
-                visited[i] = true;
-                dfs(tickets[i][1], route+" "+tickets[i][1], tickets, cnt+1);
-                visited[i] = false;
-            }
-        }
+
+    private void dfs(String start) {
+        PriorityQueue<String> strings = map.get(start);
+        while (strings != null && !strings.isEmpty()) {
+          dfs(strings.poll());  
+        } 
+        linkedList.addFirst(start);
     }
     
 }
