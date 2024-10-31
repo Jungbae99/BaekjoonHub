@@ -7,22 +7,27 @@ import java.util.StringTokenizer;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+          BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         int n = Integer.parseInt(br.readLine());
 
-        PriorityQueue<Integer> pq = new PriorityQueue<>(Comparator.reverseOrder());
+        PriorityQueue<Integer> pq = new PriorityQueue<>();
+
 
         for (int i = 0; i < n; i++) {
             StringTokenizer st = new StringTokenizer(br.readLine());
+
             for (int j = 0; j < n; j++) {
-                pq.add(Integer.parseInt(st.nextToken()));
+                int num = Integer.parseInt(st.nextToken());
+
+                if (pq.size() < n) {
+                    pq.add(num);
+                } else if (pq.peek() < num){
+                    pq.poll();
+                    pq.add(num);
+                }
             }
         }
-
-        for (int i = 0; i < n - 1; i++) {
-            pq.poll();
-        }
-
         System.out.println(pq.peek());
+
     }
 }
