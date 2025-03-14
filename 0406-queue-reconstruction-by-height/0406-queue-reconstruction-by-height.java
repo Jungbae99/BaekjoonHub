@@ -1,22 +1,12 @@
 class Solution {
 public static int[][] reconstructQueue(int[][] people) {
+        Arrays.sort(people, (o1, o2) -> o1[0] == o2[0] ? o2[1] - o1[1] : o1[0] - o2[0]);
+        List<int[]> answer = new ArrayList<>();
 
-        Queue<int[]> pq = new PriorityQueue<>(
-                (a, b) -> a[0] != b[0] ? b[0] - a[0] : a[1] - b[1]
-        );
-
-        for (int[] person : people) {
-            pq.add(person);
+        for (int i = people.length - 1; i >= 0; i--) {
+            answer.add(people[i][1], people[i]);
         }
 
-        List<int[]> result = new ArrayList<>();
-
-        while (!pq.isEmpty()) {
-            int[] person = pq.poll();
-
-            result.add(person[1], person);
-        }
-
-        return result.toArray(new int[result.size()][2]);
+        return answer.toArray(new int[answer.size()][2]);
     }
 }
