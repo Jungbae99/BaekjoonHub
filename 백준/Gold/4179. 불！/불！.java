@@ -1,101 +1,82 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.StringTokenizer;
-
-class FireNode {
-    int x, y;
-
-    public FireNode(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
-}
-
-class PersonNode {
-    int x, y;
-
-    public PersonNode(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
-}
-
+import java.io.*;
+import java.util.*;
 
 public class Main {
-    public static void main(String[] args) throws IOException {
+    static int R, C;
+    static char[][] map;
+    static int[][] fireTime;  // 불의 도착 시간
+    static int[][] jihoonTime; // 지훈이의 도착 시간
+    static int[] dx = {-1, 1, 0, 0};
+    static int[] dy = {0, 0, -1, 1};
 
+    static Queue<int[]> fireQ = new ArrayDeque<>();
+    static Queue<int[]> jihoonQ = new ArrayDeque<>();
+
+    public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
+        R = Integer.parseInt(st.nextToken());
+        C = Integer.parseInt(st.nextToken());
+        map = new char[R][C];
+        fireTime = new int[R][C];
+        jihoonTime = new int[R][C];
 
-        int n = Integer.parseInt(st.nextToken());
-        int m = Integer.parseInt(st.nextToken());
+        for (int i = 0; i < R; i++) {
+            String line = br.readLine();
+            for (int j = 0; j < C; j++) {
+                map[i][j] = line.charAt(j);
+                fireTime[i][j] = -1;
+                jihoonTime[i][j] = -1;
 
-        Queue<FireNode> fireQueue = new LinkedList<>();
-        Queue<PersonNode> personQueue = new LinkedList<>();
-
-        char[][] arr = new char[n][m];
-        int[][] fireDist = new int[n][m];
-        int[][] personDist = new int[n][m];
-
-        int[] dx = new int[]{-1, 0, 1, 0};
-        int[] dy = new int[]{0, 1, 0, -1};
-
-        for (int i = 0; i < n; i++) {
-            String s = br.readLine();
-            for (int j = 0; j < m; j++) {
-                char c = s.charAt(j);
-                arr[i][j] = c;
-                fireDist[i][j] = -1;
-                personDist[i][j] = -1;
-                if (c == 'J') {
-                    personQueue.add(new PersonNode(i, j));
-                    personDist[i][j] = 0;
+                if (map[i][j] == 'F') {
+                    fireQ.add(new int[]{i, j});
+                    fireTime[i][j] = 0;
                 }
-                if (c == 'F') {
-                    fireQueue.add(new FireNode(i, j));
-                    fireDist[i][j] = 0;
+                if (map[i][j] == 'J') {
+                    jihoonQ.add(new int[]{i, j});
+                    jihoonTime[i][j] = 0;
                 }
             }
         }
 
-
-        while (!fireQueue.isEmpty()) {
-            FireNode fireNode = fireQueue.poll();
-
-            for (int i = 0; i < 4; i++) {
-                int nX = fireNode.x + dx[i];
-                int nY = fireNode.y + dy[i];
-
-                if (nX < 0 || nX >= n || nY < 0 || nY >= m) continue;
-                if (fireDist[nX][nY] >= 0 || arr[nX][nY] == '#') continue;
-
-                fireDist[nX][nY] = fireDist[fireNode.x][fireNode.y] + 1;
-                fireQueue.add(new FireNode(nX, nY));
+        // 1. 불의 BFS (여러 개에서 동시에 퍼짐)
+        while (!fireQ.isEmpty()) {
+            int[] now = fireQ.poll();
+            int x = now[0], y = now[1];
+            for (int dir = 0; dir < 4; dir++) {
+                int nx = x + dx[dir];
+                int ny = y + dy[dir];
+                if (nx < 0 || nx >= R || ny < 0 || ny >= C) continue;
+                if (map[nx][ny] == '#' || fireTime[nx][ny] != -1) continue;
+                fireTime[nx][ny] = fireTime[x][y] + 1;
+                fireQ.add(new int[]{nx, ny});
             }
         }
 
-        while (!personQueue.isEmpty()) {
-            PersonNode personNode = personQueue.poll();
+        // 2. 지훈이의 BFS
+        while (!jihoonQ.isEmpty()) {
+            int[] now = jihoonQ.poll();
+            int x = now[0], y = now[1];
 
-            for (int i = 0; i < 4; i++) {
-                int nX = personNode.x + dx[i];
-                int nY = personNode.y + dy[i];
+            // 탈출조건: 가장자리 도착 즉시 종료
+            if (x == 0 || y == 0 || x == R-1 || y == C-1) {
+                System.out.println(jihoonTime[x][y] + 1); // 1분부터 시작이므로 +1
+                return;
+            }
 
-                if (nX < 0 || nY < 0 || nX >= n || nY >= m) {
-                    System.out.println(personDist[personNode.x][personNode.y] + 1);
-                    return;
-                }
-                if (personDist[nX][nY] >= 0 || arr[nX][nY] == '#') continue;
+            for (int dir = 0; dir < 4; dir++) {
+                int nx = x + dx[dir];
+                int ny = y + dy[dir];
+                if (nx < 0 || nx >= R || ny < 0 || ny >= C) continue;
+                if (map[nx][ny] == '#' || jihoonTime[nx][ny] != -1) continue;
+                // 불보다 먼저 도착할 수 있어야 함 (불이 아예 안 오면 fireTime[nx][ny] == -1)
+                if (fireTime[nx][ny] != -1 && fireTime[nx][ny] <= jihoonTime[x][y] + 1) continue;
 
-                if (fireDist[nX][nY] != -1 && (fireDist[nX][nY] <= personDist[personNode.x][personNode.y] + 1)) continue;
-
-                personDist[nX][nY] = personDist[personNode.x][personNode.y] + 1;
-                personQueue.add(new PersonNode(nX, nY));
+                jihoonTime[nx][ny] = jihoonTime[x][y] + 1;
+                jihoonQ.add(new int[]{nx, ny});
             }
         }
+        // 탈출 못하면
         System.out.println("IMPOSSIBLE");
     }
 }
