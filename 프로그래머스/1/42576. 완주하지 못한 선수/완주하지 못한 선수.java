@@ -2,22 +2,25 @@ import java.util.*;
 
 class Solution {
     public String solution(String[] participant, String[] completion) {
-        String answer = "";
         HashMap<String, Integer> map = new HashMap<>();
-        for (String player : participant) {
-            map.put(player, map.getOrDefault(player, 0) + 1);
+        
+        // 참가자 명단 카운트
+        for (String p : participant) {
+            map.put(p, map.getOrDefault(p, 0) + 1);
         }
-        for (String player : completion) {
-            map.put(player, map.get(player) - 1);
+        
+        // 완주자 명단 카운트 감소
+        for (String c : completion) {
+            map.put(c, map.get(c) - 1);
         }
-        Iterator<Map.Entry<String, Integer>> iter = map.entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry<String, Integer> entry = iter.next();
-            if (entry.getValue() != 0) {
-                answer = entry.getKey();
-                break;
+        
+        // 값이 0이 아닌 사람이 완주하지 못한 사람
+        for (String key : map.keySet()) {
+            if (map.get(key) != 0) {
+                return key;
             }
         }
-        return answer;
+        
+        return "";
     }
 }
