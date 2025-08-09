@@ -1,41 +1,37 @@
 class Solution {
     
-    static int answer;
-    static boolean[] visited;
-    
-    public int solution(String begin, String target, String[] words) {
-        answer = 0;
-        visited = new boolean[words.length];
-        dfs(begin, target, words, 0);
+   private int best = Integer.MAX_VALUE; // 최소 단계 저장
 
-        return answer;
+    public int solution(String begin, String target, String[] words) {
+        boolean[] visited = new boolean[words.length];
+        dfs(begin, target, words, visited, 0);
+
+        return best == Integer.MAX_VALUE ? 0 : best;
     }
-    
- private static void dfs(String begin, String target, String[] words, int cnt) {
+
+    private void dfs(String begin, String target, String[] words, boolean[] visited, int depth) {
+        if (depth >= best) return;
 
         if (begin.equals(target)) {
-            answer = cnt;
+            best = depth;
             return;
         }
 
         for (int i = 0; i < words.length; i++) {
-            if (visited[i]) {
-                continue;
-            }
-
-            int k = 0;
-
-            for (int j = 0; j < begin.length(); j++) {
-                if (begin.charAt(j) == words[i].charAt(j)) {
-                    k++;
-                }
-            }
-
-            if (k == begin.length() - 1) {
+            if (!visited[i] && diffOne(begin, words[i])) {
                 visited[i] = true;
-                dfs(words[i], target, words, cnt + 1);
+                dfs(words[i], target, words, visited, depth + 1);
                 visited[i] = false;
             }
         }
+    }
+
+    private boolean diffOne(String a, String b) {
+        int diff = 0;
+        for (int i = 0; i < a.length(); i++) {
+            if (a.charAt(i) != b.charAt(i)) diff++;
+            if (diff > 1) return false;
+        }
+        return diff == 1;
     }
 }
