@@ -2,33 +2,32 @@ import java.util.*;
 
 class Solution {
     public int[] solution(String[] operations) {
-        Queue<Integer> min = new PriorityQueue<>();
-        Queue<Integer> max = new PriorityQueue<>(Collections.reverseOrder());
+        Queue<Integer> maxQ = new PriorityQueue<>(Collections.reverseOrder());
+        Queue<Integer> minQ = new PriorityQueue<>();
 
-        for (int i = 0; i < operations.length; i++) {
-            String execute = operations[i].split(" ")[0];
-            String value = operations[i].split(" ")[1];
+        for (String op : operations) {
+            String[] arr = op.split(" ");
+            String command = arr[0];
+            String val = arr[1];
 
-            if (execute.equals("I")) {
-                min.add(Integer.valueOf(value));
-                max.add(Integer.valueOf(value));
-            }
-
-            if (execute.equals("D")) {
-                if (!max.isEmpty()) {
-                    if (value.equals("-1")) {
-                        max.remove(min.poll());
+            if ("I".equals(command)) {
+                Integer v = Integer.valueOf(val);
+                maxQ.add(v);
+                minQ.add(v);
+            } else {
+                if (!maxQ.isEmpty()) {
+                    if ("-1".equals(val)) {
+                        maxQ.remove(minQ.poll());
                     } else {
-                        min.remove(max.poll());
+                        minQ.remove(maxQ.poll());
                     }
                 }
             }
         }
 
-
-        if (max.isEmpty()) {
+        if (maxQ.isEmpty()) {
             return new int[]{0, 0};
         }
-        return new int[]{max.poll(), min.poll()};
+        return new int[]{maxQ.peek(), minQ.peek()};
     }
 }
