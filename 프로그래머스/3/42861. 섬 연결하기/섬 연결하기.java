@@ -2,39 +2,29 @@ import java.util.*;
 
 class Solution {
     public int solution(int n, int[][] costs) {
-         int answer = 0;
-        int[] parent = new int[n];
-        for (int i = 0; i < parent.length; i++) {
-            parent[i] = i;
-        }
-        Arrays.sort(costs, (o1, o2) -> {
-            return o1[2] - o2[2];
-        });
+        int answer = 0;
+        Arrays.sort(costs, (o1, o2) -> o1[2] - o2[2]);
+        parents = new int[n];
+        for(int i = 0; i< n; i++) parents[i] = i;
+        
+        for (int[] arr : costs) {
+            int start = arr[0];
+            int end = arr[1];
+            int weight = arr[2];
 
-        for (int i = 0; i < costs.length; i++) {
-            if (findParent(parent, costs[i][0]) != findParent(parent, costs[i][1])) {
-                answer += costs[i][2];
-                union(parent, costs[i][0], costs[i][1]);
-            }
+            if(unionFind(start) == unionFind(end)) continue;
+            answer += weight;
+            
+            parents[unionFind(end)] = unionFind(start);
         }
+
         return answer;
     }
-
-    private void union(int[] parent, int node1, int node2) {
-        int p1 = findParent(parent, node1); // 1
-        int p2 = findParent(parent, node2); // 4
-        if (p1 < p2) {
-            parent[p2] = p1;
-        } else {
-            parent[p1] = p2;
-        }
-    }
-
-    private int findParent(int[] parent, int node) {
-        if (parent[node] == node) {
-            return node;
-        }
-        return findParent(parent, parent[node]);
-    }
-
+    
+    static int[] parents;
+    
+    public int unionFind(int node) {
+        if(parents[node] == node) return parents[node];
+        return unionFind(parents[node]);        
+    } 
 }
